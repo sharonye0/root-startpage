@@ -1,17 +1,27 @@
 ---
-import { SECONDARY_BACKGROUND, TRANSITION_DURATION } from "../constants";
+import { USER as u } from "../constants";
+const SECONDARY_BACKGROUND = u.SECONDARY_BACKGROUND;
+const TRANSITION_DURATION = u.TRANSITION_DURATION;
+
 interface Props {
    card: Card;
 }
 
-const { name, color, link, icon } = Astro.props.card;
+const { 
+   name,
+   color,
+   link,
+   icon
+} = Astro.props.card;
+
 let cssColor: string;
 
 // the default color is #eee
 // but if we have a color it's going to be used
-
-if (!color) cssColor = "#eee";
-else cssColor = color;
+color ? 
+   cssColor = color 
+   : 
+   cssColor = "#eee"
 ---
 
 <a href={link} class="card" target="_blank">

@@ -1,51 +1,58 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Card from "../components/Card.astro";
-import { CARDS, NAME, ACCENT_COLOR } from "../constants";
+import Settings from "../components/Settings.astro";
+
+import { USER as u } from "../constants";
+const NAME = u.name;
+const ACCENT_COLOR = u.ACCENT_COLOR;
 ---
 
 <script>
    import { DAYS, MONTHS } from "../constants";
 
-   const timeElement = document.getElementById("currentTime");
-   const dateElement = document.getElementById("currentDate");
-
-   const formatDigit = (digit: number) => {
-      return digit > 9 ? `${digit}` : `0${digit}`;
-   };
+   const timeElement = document.getElementById("currentTime") as HTMLParagraphElement;
+   const dateElement = document.getElementById("currentDate") as HTMLSpanElement;
+   const settingsButton = document.querySelector(".settingsButton") as HTMLButtonElement;
+   const settingsModal = document.querySelector(".settingsModal") as HTMLDivElement;
 
    const updateDate = () => {
-      // Create a new Date object and get the complete Date/Time information
-      const completeDate = new Date();
+      const time = new Date();
 
-      // Time Variables
-      let currentHour = formatDigit(completeDate.getHours());
-      let currentMinute = formatDigit(completeDate.getMinutes());
-
-      // Date Variables
-      let currentDay = completeDate.getDay();
-      let currentDayOfMonthInNumber = completeDate.getDate();
-      let currentMonth = completeDate.getMonth();
-      let currentYear = completeDate.getFullYear();
+      const hours = time.toLocaleString('en-US', { 
+         hour: "numeric", 
+         minute: "2-digit",
+         hour12: true,
+      })
 
       // Update the Time
-      timeElement!.textContent = `${
-         +currentHour % 12 === 0 ? "12" : +currentHour
-      }:${currentMinute} ${+currentHour > 11 ? "PM" : "AM"}`;
+      timeElement.textContent = hours;
+      
+      // Date Variables
+      let currentDay = time.getDay();
+      let currentDayOfMonthInNumber = time.getDate();
+      let currentMonth = time.getMonth();
+      let currentYear = time.getFullYear();
 
       // Update the Date
-      dateElement!.textContent = `${DAYS[currentDay]} ${currentDayOfMonthInNumber}, ${MONTHS[currentMonth]} ${currentYear}`;
-
-      // Create a Loop
-      setTimeout(() => {
-         updateDate();
-      }, 1000);
+      dateElement.textContent = `${DAYS[currentDay]} ${currentDayOfMonthInNumber}, ${MONTHS[currentMonth]} ${currentYear}`;
    };
+
+   settingsButton.addEventListener("click", () => {
+      settingsModal.classList.toggle("hidden");
+   });
+   
    updateDate();
+
+   setInterval(() => {
+      updateDate();
+   }, 1000);
+
 </script>
 
 <Layout title="Welcome to Astro.">
    <div class="container">
+      <Settings />
       <header class="header">
          <div>
             <h1>Hello there, <span id="userName">{NAME}</span>.</h1>
@@ -54,9 +61,12 @@ import { CARDS, NAME, ACCENT_COLOR } from "../constants";
             </p>
          </div>
          <p id="currentTime">00:00 PM</p>
+         <button class="settingsButton">
+            <img src="/public/assets/setting.png" alt="settings" style="height: 35px; width: 35px;">
+         </button>
       </header>
       <main class="cardContainer">
-         {CARDS.map((card) => <Card card={card} />)}
+         {u.userCards.map((card) => <Card card={card} />)}
       </main>
    </div>
 </Layout>
@@ -74,6 +84,25 @@ import { CARDS, NAME, ACCENT_COLOR } from "../constants";
       justify-content: space-between;
       align-items: center;
    }
+   
+   .settingsButton {
+      position: absolute;
+      top: 50px;
+      right: 50px;
+
+      background-color: rgba(167, 167, 167, 0.267);
+      border: 0;
+      border-radius: 6px;
+      padding: 12px 12px 8px;
+      
+      cursor: pointer;
+   }
+
+   .settingsButton:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+   }
+
+
 
    #currentDate {
       color: var(--ACCENT_COLOR);

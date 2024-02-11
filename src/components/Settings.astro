@@ -1,0 +1,158 @@
+---
+import { USER as u } from "../constants";
+
+const ACCENT_COLOR = u.ACCENT_COLOR;
+const BACKGROUND_COLOR = u.BACKGROUND_COLOR;
+const SECONDARY_BACKGROUND = u.SECONDARY_BACKGROUND;
+---
+
+<script>
+import { USER as u } from "../constants";
+
+let keyboardEventListenerBinder: (event: KeyboardEvent) => void;
+
+const settingsModal = document.querySelector(".settingsModal") as HTMLDivElement;
+const optionsContiner = document.querySelector(".optionsContiner") as HTMLDivElement;
+const options = new Map<string, string>([
+    ["c", "Change colors"],
+    ["n", "Change name"],
+    ["t", "Change Time Format"],
+    ["q", "Quit settings"],
+]);
+
+const colorOptions = new Map<string, string>([
+    ["p", "Return to previous page"],
+    ["a", "Change Accent Color"],
+    ["b", "Change Background Color"],
+    ["s", "Change Secondary Background Color"],
+    ["t", "Change Text Color"],
+]);
+
+const createElement = (tagName: string): HTMLElement => document.createElement(tagName);
+
+function keyboardEventListener(event: KeyboardEvent, switchStatementFn: (key: string) => void) {
+    if (!settingsModal.classList.contains("hidden")) {
+        switchStatementFn(event.key);
+    }
+}
+
+const createListOfOptionsWithListener = (optionsMap: Map<string, string>, switchStatementFn: (key: string) => void) => {
+    document.removeEventListener("keypress", keyboardEventListenerBinder, false);
+
+    keyboardEventListenerBinder = (event: KeyboardEvent) => {
+        keyboardEventListener(event, switchStatementFn)
+    }
+    optionsContiner.replaceChildren("");
+    optionsMap.forEach((value, key) => {
+        const option = createElement("div") as HTMLDivElement;
+        option.style.backgroundColor = u.SECONDARY_BACKGROUND;
+
+        option.innerHTML = `<span class="optionKey" style="text-align: center; padding: 4px 4px; margin: 10px 5px; border-radius: 8px; width: 30px; background-color: rgba(255, 255, 255, 0.24); display: inline-block;">${key}</span> ${value}`
+        optionsContiner.appendChild(option);
+    });
+    document.addEventListener("keypress", keyboardEventListenerBinder, false);
+}
+
+function openColorsOptions() {
+    createListOfOptionsWithListener(colorOptions, (key: string) => {
+        let newColor: string | null;
+        switch(key) {
+            case "p":
+                openSettingsOptions();
+            break;
+
+            case "a":
+                newColor = prompt("Use Hex Colors Please\nNew Accent Color: ");
+                u.setAccentColor(newColor || "#d21404");
+            break;
+
+            case "b":
+                newColor = prompt("Use Hex Colors Please\nNew Background Color: ");
+                u.setAccentColor(newColor || "#d21404");
+            break;
+
+            case "s":
+                newColor = prompt("Use Hex Colors Please\nNew Secondary Background Color: ");
+                u.setAccentColor(newColor || "#d21404");
+            break;
+
+            case "t":
+                newColor = prompt("Use Hex Colors Please\nNew Text Color: ");
+                u.setAccentColor(newColor || "#d21404");
+            break;
+
+            default:
+                console.log("Nothing");
+        }
+    });
+}
+
+function openSettingsOptions() {
+    createListOfOptionsWithListener(options, (key: string) => {
+        switch(key) {
+            case "q":
+                settingsModal.classList.add("hidden");    
+            break;
+
+            case "n":
+                const name = prompt("New Name: ");
+                u.setName(name || "USER");
+            break;
+        
+            case "c":
+                openColorsOptions();
+            break;
+
+            case "t":
+                openColorsOptions();
+            break;
+
+            default:
+                console.log("Nothing");
+        }
+    });
+}
+
+
+openSettingsOptions();
+
+</script>
+
+<div class="settingsModal hidden">
+    <div class="optionsContiner"></div>
+</div>
+
+<style define:vars={{ ACCENT_COLOR, BACKGROUND_COLOR, SECONDARY_BACKGROUND }}>
+        
+    .hidden {
+      display: none;
+    }
+
+    .settingsModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      margin-top: -100px;  /* Negative half of height. */
+      margin-left: -250px;  /* Negative half of width. */
+
+      min-width: 500px;
+      min-height: 200px;
+      padding: 10px;
+
+      border: 3px solid var(--ACCENT_COLOR);
+      border-radius: 15px;
+      background-color: var(--BACKGROUND_COLOR);
+
+      z-index: 100;
+    }
+
+    .optionsContiner {
+        height: auto;
+    }
+
+    .optionKey {
+        
+    }
+
+
+</style>
